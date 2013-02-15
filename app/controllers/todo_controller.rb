@@ -16,12 +16,16 @@ class TodoController
   end
  
   def execute!
-    if self.respond_to?(action.to_sym)
-      unless self.send(action.to_sym)
-        user_interface.invalid_id
-      end 
+    if check_list_name
+      if self.respond_to?(action.to_sym)
+        unless self.send(action.to_sym)
+          user_interface.invalid_id
+        end 
+      else
+        user_interface.non_action
+      end
     else
-      user_interface.non_action
+      user_interface.invalid_list
     end
   end
 
@@ -36,8 +40,9 @@ class TodoController
   end
 
   def show_list
+    items = ListItem.where(:list_id => list.id)
+    return false if items.nil?
 
-    items = Item.where(:list_id => list.id)
     user_interface.display_list(items)
     true
   end
@@ -49,13 +54,13 @@ class TodoController
   end
 
   def add_item
-    item = Item.create!(default_task_args)
+    item = ListItem.create!(default_task_args)
     user_interface.confirm_add(list_name, item)
     true
   end
 
   def complete_item
-    item = Item.find(id)
+    item = ListItem.find(id)
     return false if item.nil?
 
     item.complete!
@@ -64,7 +69,7 @@ class TodoController
   end
 
   def delete_item
-    item = Item.find(id)
+    item = ListItem.find(id)
     return false if item.nil?
 
     user_interface.confirm_delete(list_name, item)
@@ -75,5 +80,7 @@ class TodoController
   private
 
   def check_list_name
+    List.where(:name => list_name).first
   end
+
 end

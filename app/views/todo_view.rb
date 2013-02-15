@@ -32,6 +32,10 @@ class TodoView
   def non_action
     puts "Command not recognized."
   end
+
+  def invalid_list
+    puts "Invalid list."
+  end
  
   def invalid_id
     puts "Invalid id."
