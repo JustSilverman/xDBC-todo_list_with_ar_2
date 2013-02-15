@@ -1,3 +1,5 @@
+require_relative '../../db/config.rb'
+
 class ListItem < ActiveRecord::Base
 
   def complete!
