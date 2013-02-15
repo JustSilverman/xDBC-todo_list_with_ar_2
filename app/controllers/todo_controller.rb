@@ -2,13 +2,14 @@ require_relative '..models/list_item'
 require_relative '../view/todo_view'
  
 class TodoController
-  attr_reader :id, :action, :task, :user_interface, :list_name, :tags
+  attr_reader :id, :action, :task, :user_interface, :list_name, :tags, :list
  
   def initialize(args)
     @id             = args[:id]
     @action         = args[:action]
     @task           = args[:task]
     @list_name      = args[:list_name]
+    @list           = List.where(:name => list_name).first
     @tags           = args[:tags]
     @user_interface = TodoView.new
     execute!
@@ -25,7 +26,7 @@ class TodoController
   end
 
   def default_task_args
-    {"id" => id, "list_name" => list_name, "tags" => tags, "task" => task, "completed_at" => nil}
+    {"id" => id, "list_name" => list_name, "list_id" => list.id, "tags" => tags, "task" => task, "completed_at" => nil}
   end
 
   def create_list
@@ -33,14 +34,17 @@ class TodoController
   end
 
   def show_list
+    Item.where(:list_id => list.id)
   end
 
   def delete_list
+    user_interface.confirm_delete(list)
+    list.destroy
+    true
   end
 
   def add_task
-    list = List.where(:name => list_name).first
-    Task.create!(:list_id => list.id )
+    Item.create!(default_task_args)
   end
 
   def complete_task

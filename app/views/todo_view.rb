@@ -3,8 +3,8 @@ require_relative "../models/list_item"
 class TodoView
   COMPLETION = {true => "[X]", false => "[ ]"}
  
-  def display_list(list)
-    list.each_with_index do |item, index|
+  def display_list(items)
+    items.each_with_index do |item, index|
       index += 1
       puts "#{index}.".ljust(4) + " #{COMPLETION[item.completed?]} #{item.task}"
     end
