@@ -3,6 +3,7 @@ require 'rspec/core/rake_task'
 require 'faker'
 require_relative 'db/config'
 require_relative 'app/models/list_item'
+require_relative 'app/models/list'
 
 desc "create the database"
 task "db:create" do
@@ -25,9 +26,17 @@ end
 
 desc "populate the test database with sample data"
 task "db:populate" do
+  10.times do
+    List.create(:name  => "#{Faker::Name.name}'s list")
+  end
+
+  all_lists = List.all
   100.times do 
-    ListItem.create(:task         => Faker::Company.bs,
-                    :completed_at => nil)
+    new_list_item = ListItem.create(:task => Faker::Company.bs,
+                                    :completed_at => nil)
+    list = all_lists.sample
+    list.list_items << new_list_item
+    new_list_item.save
   end
 end
 
