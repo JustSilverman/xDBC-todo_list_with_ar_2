@@ -2,7 +2,7 @@ require 'rake'
 require 'rspec/core/rake_task'
 require 'faker'
 require_relative 'db/config'
-
+require_relative 'app/models/list_item'
 
 desc "create the database"
 task "db:create" do

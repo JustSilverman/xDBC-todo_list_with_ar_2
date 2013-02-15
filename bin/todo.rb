@@ -1,4 +1,4 @@
-require_relative '../app/models/controller'
+require_relative '../app/controllers/todo_controller.rb'
  
 class ToDo
   def self.run(commands)
