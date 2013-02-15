@@ -29,6 +29,7 @@ class TodoController
   end
 
   def create_list
+    List.create!(default_task_args)
   end
 
   def show_list
