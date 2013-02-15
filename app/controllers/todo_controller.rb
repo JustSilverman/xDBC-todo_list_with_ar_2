@@ -31,53 +31,49 @@ class TodoController
 
   def create_list
     List.create!(default_task_args)
+    user_interface.confirm_create(list_name)
+    true
   end
 
   def show_list
-    Item.where(:list_id => list.id)
+
+    items = Item.where(:list_id => list.id)
+    user_interface.display_list(items)
+    true
   end
 
   def delete_list
-    user_interface.confirm_delete(list)
+    user_interface.confirm_delete_list(list)
     list.destroy
     true
   end
 
-  def add_task
-    Item.create!(default_task_args)
-  end
-
-  def complete_task
-  end
-
-  def delete_task
-  end
- 
-  def add
-    item = ListItem.create!(default_task_args)
-    user_interface.confirm_add(item)
+  def add_item
+    item = Item.create!(default_task_args)
+    user_interface.confirm_add(list_name, item)
     true
   end
- 
-  def list
-    user_interface.display_list(ListItem.all)
-  end
- 
-  def delete
-    item = ListItem.all[id-1]
+
+  def complete_item
+    item = Item.find(id)
     return false if item.nil?
- 
-    user_interface.confirm_delete(item)
-    item.destroy
-    true
-  end
- 
-  def complete
-    item = ListItem.all[id-1]
-    return false if item.nil?
- 
+
     item.complete!
     user_interface.confirm_complete(item)
     true
+  end
+
+  def delete_item
+    item = Item.find(id)
+    return false if item.nil?
+
+    user_interface.confirm_delete(list_name, item)
+    item.destroy
+    true
+  end
+
+  private
+
+  def check_list_name
   end
 end
