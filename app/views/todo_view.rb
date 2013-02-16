@@ -4,6 +4,7 @@ class TodoView
   COMPLETION = {true => "[X]", false => "[ ]"}
  
   def display_list(items)
+    puts "No items in list." if items.empty?
     items.each_with_index do |item, index|
       puts "#{index + 1}.".ljust(4) + " #{COMPLETION[item.completed?]} #{item.task}"
     end

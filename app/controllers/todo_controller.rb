@@ -1,5 +1,6 @@
-require_relative '..models/list_item'
-require_relative '../view/todo_view'
+require_relative '../models/list_item'
+require_relative '../models/list'
+require_relative '../views/todo_view'
  
 class TodoController
   attr_reader :id, :action, :task, :user_interface, :list_name, :tags, :list
@@ -9,14 +10,14 @@ class TodoController
     @action         = args[:action]
     @task           = args[:task]
     @list_name      = args[:list_name]
-    @list           = List.where(:name => list_name).first
-    @tags           = args[:tags]
+    @list           = List.find_by_name(list_name)
+    # @tags           = args[:tags]
     @user_interface = TodoView.new
     execute!
   end
  
   def execute!
-    if check_list_name
+    if check_list_name || action == "create_list"
       if self.respond_to?(action.to_sym)
         unless self.send(action.to_sym)
           user_interface.invalid_id
@@ -29,12 +30,12 @@ class TodoController
     end
   end
 
-  def default_task_args
-    {"id" => id, "list_name" => list_name, "list_id" => list.id, "tags" => tags, "task" => task, "completed_at" => nil}
+  def list_item_args
+    {"task" => task, "completed_at" => nil, "list" => list}
   end
 
   def create_list
-    List.create!(default_task_args)
+    List.create!(:name => list_name)
     user_interface.confirm_create(list_name)
     true
   end
@@ -50,17 +51,16 @@ class TodoController
   def delete_list
     user_interface.confirm_delete_list(list)
     list.destroy
-    true
   end
 
   def add_item
-    item = ListItem.create!(default_task_args)
+    item = ListItem.create!(list_item_args)
     user_interface.confirm_add(list_name, item)
     true
   end
 
   def complete_item
-    item = ListItem.find(id)
+    item = list.list_items[id.to_i - 1]
     return false if item.nil?
 
     item.complete!
@@ -69,18 +69,15 @@ class TodoController
   end
 
   def delete_item
-    item = ListItem.find(id)
+    item = list.list_items[id.to_i - 1]
     return false if item.nil?
 
     user_interface.confirm_delete(list_name, item)
     item.destroy
-    true
   end
 
   private
-
   def check_list_name
-    List.where(:name => list_name).first
+    List.find_by_name(list_name)
   end
-
 end
